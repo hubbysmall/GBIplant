@@ -74,7 +74,7 @@ namespace GBIplantView
                 {
                     model = new GBIpieceofArt__ingridientViewModel
                     {
-                        GBIpieceofArtId = Convert.ToInt32(comboBoxComponent.SelectedValue),
+                        GBIingridientId = Convert.ToInt32(comboBoxComponent.SelectedValue),
                         GBIingridientName = comboBoxComponent.Text,
                         Count = Convert.ToInt32(textBoxCount.Text)
                     };
