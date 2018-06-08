@@ -55,6 +55,7 @@ namespace GBIplantRESTapi
             container.RegisterType<IStorageService, StorageServiceBD>(new HierarchicalLifetimeManager());
             container.RegisterType<IMainService, MainServiceDB>(new HierarchicalLifetimeManager());
             container.RegisterType<IReportingService, ReportingServiceBD>(new HierarchicalLifetimeManager());
+            container.RegisterType<IMessageInfoService, MessageInfoServiceBD>(new HierarchicalLifetimeManager());
         }
     }
 }

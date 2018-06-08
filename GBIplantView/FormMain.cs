@@ -209,5 +209,10 @@ namespace GBIplantView
             var form = new FormBuyerZakazes();
             form.ShowDialog();
         }
+
+        private void письмаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

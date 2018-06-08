@@ -51,6 +51,7 @@
     <Compile Include="GBIindgridient.cs" />
     <Compile Include="GBIpieceOfArt.cs" />
     <Compile Include="GBIpieceofArt__ingridient.cs" />
+    <Compile Include="MessageInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage.cs" />
     <Compile Include="Storage__GBIingridient.cs" />

@@ -81,6 +81,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
@@ -97,6 +98,7 @@
     <Compile Include="BindingModels\GBIingridientBindingModel.cs" />
     <Compile Include="BindingModels\GBIpieceOfArtBindingModel.cs" />
     <Compile Include="BindingModels\GBIpieceofArt__ingridientBindingModel.cs" />
+    <Compile Include="BindingModels\MessageInfoBindingModel.cs" />
     <Compile Include="BindingModels\ReportingBindingModel.cs" />
     <Compile Include="BindingModels\StorageBindingModel.cs" />
     <Compile Include="BindingModels\Storage__GBIingridientBindingModel.cs" />
@@ -106,11 +108,16 @@
     <Compile Include="Interfaces\IGBIingridientService.cs" />
     <Compile Include="Interfaces\IGBIpieceOfArtService.cs" />
     <Compile Include="Interfaces\IMainService.cs" />
+    <Compile Include="Interfaces\IMessageInfoService.cs" />
     <Compile Include="Interfaces\IReportingService.cs" />
     <Compile Include="Interfaces\IStorageService.cs" />
-    <Compile Include="Migrations\201803301532198_MyMigra.cs" />
-    <Compile Include="Migrations\201803301532198_MyMigra.Designer.cs">
-      <DependentUpon>201803301532198_MyMigra.cs</DependentUpon>
+    <Compile Include="Migrations\201806080736491_Migr.cs" />
+    <Compile Include="Migrations\201806080736491_Migr.Designer.cs">
+      <DependentUpon>201806080736491_Migr.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201806080744178_Migr2.cs" />
+    <Compile Include="Migrations\201806080744178_Migr2.Designer.cs">
+      <DependentUpon>201806080744178_Migr2.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -124,6 +131,7 @@
     <Compile Include="realizationDB\GBIingridientsServiceDB.cs" />
     <Compile Include="realizationDB\GBIpieceOfArtServiceDB.cs" />
     <Compile Include="realizationDB\MainServiceDB.cs" />
+    <Compile Include="realizationDB\MessageInfoServiceBD.cs" />
     <Compile Include="realizationDB\ReportingServiceBD.cs" />
     <Compile Include="realizationDB\StorageServiceBD.cs" />
     <Compile Include="realizationOfInterfaces\BuyerServiceList.cs" />
@@ -139,6 +147,7 @@
     <Compile Include="ViewModels\GBIingridientViewModel.cs" />
     <Compile Include="ViewModels\GBIpieceOfArtViewModel.cs" />
     <Compile Include="ViewModels\GBIpieceofArt__ingridientViewModel.cs" />
+    <Compile Include="ViewModels\MessageInfoViewModel.cs" />
     <Compile Include="ViewModels\StorageLoadViewModel.cs" />
     <Compile Include="ViewModels\StorageViewModel.cs" />
     <Compile Include="ViewModels\Storage__GBIingridientViewModel.cs" />
@@ -157,8 +166,11 @@
     <None Include="Resources\TIMCYR.TTF" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201803301532198_MyMigra.resx">
-      <DependentUpon>201803301532198_MyMigra.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201806080736491_Migr.resx">
+      <DependentUpon>201806080736491_Migr.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806080744178_Migr2.resx">
+      <DependentUpon>201806080744178_Migr2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
