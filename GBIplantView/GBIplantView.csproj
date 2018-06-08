@@ -41,6 +41,34 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ReportViewer.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.Winforms.140.1000.523\lib\net40\Microsoft.ReportViewer.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.DataVisualization, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.Winforms.140.1000.523\lib\net40\Microsoft.ReportViewer.DataVisualization.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.Design, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.Winforms.140.1000.523\lib\net40\Microsoft.ReportViewer.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.ProcessingObjectModel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.Winforms.140.1000.523\lib\net40\Microsoft.ReportViewer.ProcessingObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WebForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Report.Viewer.11.0.0.0\lib\net\Microsoft.ReportViewer.WebForms.DLL</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.Winforms.140.1000.523\lib\net40\Microsoft.ReportViewer.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Types, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.SqlServer.Types.14.0.314.76\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -86,6 +114,12 @@
     </Compile>
     <Compile Include="FormBuyers.Designer.cs">
       <DependentUpon>FormBuyers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormBuyerZakazes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormBuyerZakazes.Designer.cs">
+      <DependentUpon>FormBuyerZakazes.cs</DependentUpon>
     </Compile>
     <Compile Include="FormCreateZakaz.cs">
       <SubType>Form</SubType>
@@ -159,6 +193,12 @@
     <Compile Include="FormStorages.Designer.cs">
       <DependentUpon>FormStorages.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormStoragesLoad.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormStoragesLoad.Designer.cs">
+      <DependentUpon>FormStoragesLoad.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormTakeZakazInWork.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -167,11 +207,15 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlServerTypes\Loader.cs" />
     <EmbeddedResource Include="FormBuyer.resx">
       <DependentUpon>FormBuyer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormBuyers.resx">
       <DependentUpon>FormBuyers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormBuyerZakazes.resx">
+      <DependentUpon>FormBuyerZakazes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormCreateZakaz.resx">
       <DependentUpon>FormCreateZakaz.cs</DependentUpon>
@@ -209,6 +253,9 @@
     <EmbeddedResource Include="FormStorages.resx">
       <DependentUpon>FormStorages.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FormStoragesLoad.resx">
+      <DependentUpon>FormStoragesLoad.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormTakeZakazInWork.resx">
       <DependentUpon>FormTakeZakazInWork.cs</DependentUpon>
     </EmbeddedResource>
@@ -221,6 +268,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="ReportGBI.rdlc" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -244,6 +292,21 @@
       <Project>{f48dd22f-8200-4fae-8f92-a38ae0c1d44d}</Project>
       <Name>GBIplantService</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SqlServerTypes\readme.htm" />
+    <Content Include="SqlServerTypes\x64\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x64\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

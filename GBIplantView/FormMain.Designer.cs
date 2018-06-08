@@ -36,6 +36,10 @@
             this.складыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.сотруднкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.пополнитьСкладToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.отчётыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.прайслистЖБИизделийToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.наполнениеСкладовToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.накладныеКлиентовToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonRef = new System.Windows.Forms.Button();
             this.buttonPayOrder = new System.Windows.Forms.Button();
             this.buttonOrderReady = new System.Windows.Forms.Button();
@@ -50,7 +54,8 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.справочникиToolStripMenuItem,
-            this.пополнитьСкладToolStripMenuItem});
+            this.пополнитьСкладToolStripMenuItem,
+            this.отчётыToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1131, 24);
@@ -110,6 +115,38 @@
             this.пополнитьСкладToolStripMenuItem.Size = new System.Drawing.Size(115, 20);
             this.пополнитьСкладToolStripMenuItem.Text = "Пополнить склад";
             this.пополнитьСкладToolStripMenuItem.Click += new System.EventHandler(this.пополнитьСкладToolStripMenuItem_Click);
+            // 
+            // отчётыToolStripMenuItem
+            // 
+            this.отчётыToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.прайслистЖБИизделийToolStripMenuItem,
+            this.наполнениеСкладовToolStripMenuItem,
+            this.накладныеКлиентовToolStripMenuItem});
+            this.отчётыToolStripMenuItem.Name = "отчётыToolStripMenuItem";
+            this.отчётыToolStripMenuItem.Size = new System.Drawing.Size(60, 20);
+            this.отчётыToolStripMenuItem.Text = "Отчёты";
+            this.отчётыToolStripMenuItem.Click += new System.EventHandler(this.отчётыToolStripMenuItem_Click);
+            // 
+            // прайслистЖБИизделийToolStripMenuItem
+            // 
+            this.прайслистЖБИизделийToolStripMenuItem.Name = "прайслистЖБИизделийToolStripMenuItem";
+            this.прайслистЖБИизделийToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.прайслистЖБИизделийToolStripMenuItem.Text = "Прайс-лист ЖБИ-изделий";
+            this.прайслистЖБИизделийToolStripMenuItem.Click += new System.EventHandler(this.Прайс_лист_ЖБИ_изделийToolStripMenuItem_Click);
+            // 
+            // наполнениеСкладовToolStripMenuItem
+            // 
+            this.наполнениеСкладовToolStripMenuItem.Name = "наполнениеСкладовToolStripMenuItem";
+            this.наполнениеСкладовToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.наполнениеСкладовToolStripMenuItem.Text = "Наполнение складов";
+            this.наполнениеСкладовToolStripMenuItem.Click += new System.EventHandler(this.Наполнение_складовToolStripMenuItem_Click);
+            // 
+            // накладныеКлиентовToolStripMenuItem
+            // 
+            this.накладныеКлиентовToolStripMenuItem.Name = "накладныеКлиентовToolStripMenuItem";
+            this.накладныеКлиентовToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.накладныеКлиентовToolStripMenuItem.Text = "Накладные клиентов";
+            this.накладныеКлиентовToolStripMenuItem.Click += new System.EventHandler(this.накладныеКлиентовToolStripMenuItem_Click);
             // 
             // buttonRef
             // 
@@ -214,5 +251,9 @@
         private System.Windows.Forms.Button buttonTakeOrderInWork;
         private System.Windows.Forms.Button buttonCreateOrder;
         private System.Windows.Forms.DataGridView dataGridView;
+        private System.Windows.Forms.ToolStripMenuItem отчётыToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem прайслистЖБИизделийToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem наполнениеСкладовToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem накладныеКлиентовToolStripMenuItem;
     }
 }

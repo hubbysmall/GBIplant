@@ -36,6 +36,7 @@ namespace GBIplantView
             currentContainer.RegisterType<IGBIpieceOfArtService, GBIpieceOfArtServiceDB>(new HierarchicalLifetimeManager());
             currentContainer.RegisterType<IStorageService, StorageServiceBD>(new HierarchicalLifetimeManager());
             currentContainer.RegisterType<IMainService, MainServiceDB>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IReportingService, ReportingServiceBD>(new HierarchicalLifetimeManager());
 
             return currentContainer;
         }
