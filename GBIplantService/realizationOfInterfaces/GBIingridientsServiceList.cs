@@ -21,48 +21,38 @@ namespace GBIplantService.realizationOfInterfaces
 
         public List<GBIingridientViewModel> GetList()
         {
-            List<GBIingridientViewModel> result = new List<GBIingridientViewModel>();
-            for (int i = 0; i < source.GBIindgridients.Count; ++i)
-            {
-                result.Add(new GBIingridientViewModel
+            List<GBIingridientViewModel> result = source.GBIindgridients
+                .Select(rec => new GBIingridientViewModel
                 {
-                    Id = source.GBIindgridients[i].Id,
-                    GBIingridientName = source.GBIindgridients[i].GBIindgridientName
-                });
-            }
+                    Id = rec.Id,
+                    GBIingridientName = rec.GBIindgridientName
+                })
+                .ToList();
             return result;
         }
 
         public GBIingridientViewModel GetGBIingridient(int id)
         {
-            for (int i = 0; i < source.GBIindgridients.Count; ++i)
+            GBIindgridient element = source.GBIindgridients.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.GBIindgridients[i].Id == id)
+                return new GBIingridientViewModel
                 {
-                    return new GBIingridientViewModel
-                    {
-                        Id = source.GBIindgridients[i].Id,
-                        GBIingridientName = source.GBIindgridients[i].GBIindgridientName
-                    };
-                }
+                    Id = element.Id,
+                    GBIingridientName = element.GBIindgridientName
+                };
             }
-            throw new Exception("Ингридиент не найден");
+            throw new Exception("Элемент не найден");
         }
 
         public void AddGBIingridient(GBIingridientBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.GBIindgridients.Count; ++i)
+            GBIindgridient element = source.GBIindgridients.FirstOrDefault(rec => rec.GBIindgridientName == model.GBIingridient);
+            if (element != null)
             {
-                if (source.GBIindgridients[i].Id > maxId)
-                {
-                    maxId = source.GBIindgridients[i].Id;
-                }
-                if (source.GBIindgridients[i].GBIindgridientName == model.GBIingridient)
-                {
-                    throw new Exception("Уже есть Ингридиент с таким названием");
-                }
+                throw new Exception("Уже есть компонент с таким названием");
             }
+            int maxId = source.GBIindgridients.Count > 0 ? source.GBIindgridients.Max(rec => rec.Id) : 0;
             source.GBIindgridients.Add(new GBIindgridient
             {
                 Id = maxId + 1,
@@ -72,37 +62,31 @@ namespace GBIplantService.realizationOfInterfaces
 
         public void UpdGBIingridient(GBIingridientBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.GBIindgridients.Count; ++i)
+            GBIindgridient element = source.GBIindgridients.FirstOrDefault(rec =>
+                                        rec.GBIindgridientName == model.GBIingridient && rec.Id != model.Id);
+            if (element != null)
             {
-                if (source.GBIindgridients[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.GBIindgridients[i].GBIindgridientName == model.GBIingridient &&
-                    source.GBIindgridients[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть Ингридиент с таким названием");
-                }
+                throw new Exception("Уже есть компонент с таким названием");
             }
-            if (index == -1)
+            element = source.GBIindgridients.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
-                throw new Exception("Ингридиент не найден");
+                throw new Exception("Элемент не найден");
             }
-            source.GBIindgridients[index].GBIindgridientName = model.GBIingridient;
+            element.GBIindgridientName = model.GBIingridient;
         }
 
         public void DelGBIingridient(int id)
         {
-            for (int i = 0; i < source.GBIindgridients.Count; ++i)
+            GBIindgridient element = source.GBIindgridients.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.GBIindgridients[i].Id == id)
-                {
-                    source.GBIindgridients.RemoveAt(i);
-                    return;
-                }
+                source.GBIindgridients.Remove(element);
             }
-            throw new Exception("Ингридиент не найден");
+            else
+            {
+                throw new Exception("Элемент не найден");
+            }
         }
     }
 }

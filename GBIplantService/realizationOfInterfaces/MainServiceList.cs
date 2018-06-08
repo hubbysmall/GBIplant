@@ -21,69 +21,33 @@ namespace GBIplantService.realizationOfInterfaces
 
         public List<ZakazViewModel> GetList()
         {
-            List<ZakazViewModel> result = new List<ZakazViewModel>();
-            for (int i = 0; i < source.Zakazes.Count; ++i)
-            {
-                string clientFIO = string.Empty;
-                for (int j = 0; j < source.Buyers.Count; ++j)
+            List<ZakazViewModel> result = source.Zakazes
+                .Select(rec => new ZakazViewModel
                 {
-                    if(source.Buyers[j].Id == source.Zakazes[i].BuyerId)
-                    {
-                        clientFIO = source.Buyers[j].BuyerFIO;
-                        break;
-                    }
-                }
-                string productName = string.Empty;
-                for (int j = 0; j < source.GBIpieceOfArts.Count; ++j)
-                {
-                    if (source.GBIpieceOfArts[j].Id == source.Zakazes[i].GBIpieceofArtId)
-                    {
-                        productName = source.GBIpieceOfArts[j].GBIpieceOfArtNAme;
-                        break;
-                    }
-                }
-                string implementerFIO = string.Empty;
-                if(source.Zakazes[i].ExecutorId.HasValue)
-                {
-                    for (int j = 0; j < source.Executors.Count; ++j)
-                    {
-                        if (source.Executors[j].Id == source.Zakazes[i].ExecutorId.Value)
-                        {
-                            implementerFIO = source.Executors[j].ExecutorFIO;
-                            break;
-                        }
-                    }
-                }
-                result.Add(new ZakazViewModel
-                {
-                    Id = source.Zakazes[i].Id,
-                    BuyerId = source.Zakazes[i].BuyerId,
-                    BuyerFIO = clientFIO,
-                    GBIpieceOfArtId = source.Zakazes[i].GBIpieceofArtId,
-                    GBIpieceOfArtName = productName,   /////??????
-                    ExecutorId = source.Zakazes[i].ExecutorId,
-                    ExecutorName = implementerFIO,
-                    Count = source.Zakazes[i].Count,
-                    Sum = source.Zakazes[i].Sum,
-                    DateCreate = source.Zakazes[i].DateCreate.ToLongDateString(),
-                   // DateExecute = source.Zakazes[i].DateExecute?.ToLongDateString(),
-                    DateExecute = source.Zakazes[i].DateCreate.ToLongDateString(),
-                    Status = source.Zakazes[i].Status.ToString()
-                });
-            }
+                    Id = rec.Id,
+                    BuyerId = rec.BuyerId,
+                    GBIpieceOfArtId = rec.GBIpieceofArtId,
+                    ExecutorId = rec.ExecutorId,
+                    DateCreate = rec.DateCreate.ToLongDateString(),
+                    DateExecute = rec.DateCreate.ToLongDateString(),
+                    //DateExecute = rec.DateExecute?.ToLongDateString(),
+                    Status = rec.Status.ToString(),
+                    Count = rec.Count,
+                    Sum = rec.Sum,
+                    BuyerFIO = source.Buyers
+                                    .FirstOrDefault(recC => recC.Id == rec.BuyerId).BuyerFIO, //?.BuyerFIO,
+                    GBIpieceOfArtName = source.GBIpieceOfArts
+                                    .FirstOrDefault(recP => recP.Id == rec.GBIpieceofArtId).GBIpieceOfArtNAme, //?.GBIpieceOfArtNAme,
+                    ExecutorName = source.Executors
+                                    .FirstOrDefault(recI => recI.Id == rec.ExecutorId).ExecutorFIO //?.ExecutorFIO
+                })
+                .ToList();
             return result;
         }
 
         public void CreateZakaz(ZakazBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Zakazes.Count; ++i)
-            {
-                if (source.Zakazes[i].Id > maxId)
-                {
-                    maxId = source.Buyers[i].Id;
-                }
-            }
+            int maxId = source.Zakazes.Count > 0 ? source.Zakazes.Max(rec => rec.Id) : 0;
             source.Zakazes.Add(new Zakaz
             {
                 Id = maxId + 1,
@@ -98,134 +62,92 @@ namespace GBIplantService.realizationOfInterfaces
 
         public void TakeZakazInWork(ZakazBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Zakazes.Count; ++i)
-            {
-                if (source.Zakazes[i].Id == model.Id)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1)
+            Zakaz element = source.Zakazes.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
             // смотрим по количеству компонентов на складах
-            for (int i = 0; i < source.GBIpieceofArt__ingridients.Count; ++i)
+            var productComponents = source.GBIpieceofArt__ingridients.Where(rec => rec.GBIpieceOfArtId == element.GBIpieceofArtId);
+            foreach(var productComponent in productComponents)
             {
-                if (source.GBIpieceofArt__ingridients[i].GBIpieceOfArtId == source.Zakazes[index].GBIpieceofArtId)
+                int countOnStocks = source.Storage__GBIingridients
+                                            .Where(rec => rec.GBIingridientId == productComponent.GBIindgridientId)
+                                            .Sum(rec => rec.Count);
+                if (countOnStocks < productComponent.Count * element.Count)
                 {
-                    int countOnStocks = 0;
-                    for (int j = 0; j < source.Storage__GBIingridients.Count; ++j)
-                    {
-                        if (source.Storage__GBIingridients[j].GBIingridientId == source.GBIpieceofArt__ingridients[i].GBIindgridientId)
-                        {
-                            countOnStocks += source.Storage__GBIingridients[j].Count;
-                        }
-                    }
-                    if (countOnStocks < source.GBIpieceofArt__ingridients[i].Count * source.Zakazes[index].Count)
-                    {
-                        for (int j = 0; j < source.GBIindgridients.Count; ++j)
-                        {
-                            if (source.GBIindgridients[j].Id == source.GBIpieceofArt__ingridients[i].GBIindgridientId)
-                            {
-                                throw new Exception("Не достаточно компонента " + source.GBIindgridients[j].GBIindgridientName +
-                                    " требуется " + source.GBIpieceofArt__ingridients[i].Count + ", в наличии " + countOnStocks);
-                            }
-                        }
-                    }
+                    var componentName = source.GBIindgridients
+                                    .FirstOrDefault(rec => rec.Id == productComponent.GBIindgridientId);
+                    throw new Exception("Не достаточно компонента " + componentName.GBIindgridientName +  // + componentName?.GBIindgridientName +
+                        " требуется " + productComponent.Count + ", в наличии " + countOnStocks);
                 }
             }
             // списываем
-            for (int i = 0; i < source.GBIpieceofArt__ingridients.Count; ++i)
+            foreach (var productComponent in productComponents)
             {
-                if (source.GBIpieceofArt__ingridients[i].GBIpieceOfArtId == source.Zakazes[index].GBIpieceofArtId)
+                int countOnStocks = productComponent.Count * element.Count;
+                var stockComponents = source.Storage__GBIingridients
+                                            .Where(rec => rec.GBIingridientId == productComponent.GBIindgridientId);
+                foreach (var stockComponent in stockComponents)
                 {
-                    int countOnStocks = source.GBIpieceofArt__ingridients[i].Count * source.Zakazes[index].Count;
-                    for (int j = 0; j < source.Storage__GBIingridients.Count; ++j)
+                    // компонентов на одном слкаде может не хватать
+                    if (stockComponent.Count >= countOnStocks)
                     {
-                        if (source.Storage__GBIingridients[j].GBIingridientId == source.GBIpieceofArt__ingridients[i].GBIindgridientId)
-                        {
-                            // компонентов на одном слкаде может не хватать
-                            if (source.Storage__GBIingridients[j].Count >= countOnStocks)
-                            {
-                                source.Storage__GBIingridients[j].Count -= countOnStocks;
-                                break;
-                            }
-                            else
-                            {
-                                countOnStocks -= source.Storage__GBIingridients[j].Count;
-                                source.Storage__GBIingridients[j].Count = 0;
-                            }
-                        }
+                        stockComponent.Count -= countOnStocks;
+                        break;
+                    }
+                    else
+                    {
+                        countOnStocks -= stockComponent.Count;
+                        stockComponent.Count = 0;
                     }
                 }
             }
-            source.Zakazes[index].ExecutorId = model.ExecutorId;
-            source.Zakazes[index].DateExecute = DateTime.Now;
-            source.Zakazes[index].Status = ZakazStatus.inProcess;
+            element.ExecutorId = model.ExecutorId;
+            element.DateCreate = DateTime.Now;
+            element.Status = ZakazStatus.inProcess;
         }
 
         public void FinishZakaz(int id)
         {
-            int index = -1;
-            for (int i = 0; i < source.Zakazes.Count; ++i)
-            {
-                if (source.Buyers[i].Id == id)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1)
+            Zakaz element = source.Zakazes.FirstOrDefault(rec => rec.Id == id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Zakazes[index].Status = ZakazStatus.ready;
+            element.Status = ZakazStatus.ready;
         }
 
         public void PayZakaz(int id)
         {
-            int index = -1;
-            for (int i = 0; i < source.Zakazes.Count; ++i)
-            {
-                if (source.Buyers[i].Id == id)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1)
+            Zakaz element = source.Zakazes.FirstOrDefault(rec => rec.Id == id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Zakazes[index].Status = ZakazStatus.paid;
+            element.Status = ZakazStatus.paid;
         }
 
         public void PutGBIingridientInStorage(Storage__GBIingridientBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Storage__GBIingridients.Count; ++i)
+            Storage__GBIingridient element = source.Storage__GBIingridients
+                                                .FirstOrDefault(rec => rec.StorageId == model.StorageId &&
+                                                                    rec.GBIingridientId == model.GBIingridientId);
+            if (element != null)
             {
-                if (source.Storage__GBIingridients[i].StorageId == model.StorageId &&
-                    source.Storage__GBIingridients[i].GBIingridientId == model.GBIingridientId)
-                {
-                    source.Storage__GBIingridients[i].Count += model.Count;
-                    return;
-                }
-                if (source.Storage__GBIingridients[i].Id > maxId)
-                {
-                    maxId = source.Storage__GBIingridients[i].Id;
-                }
+                element.Count += model.Count;
             }
-            source.Storage__GBIingridients.Add(new Storage__GBIingridient
+            else
             {
-                Id = ++maxId,
-                StorageId = model.StorageId,
-                GBIingridientId = model.GBIingridientId,
-                Count = model.Count
-            });
+                int maxId = source.Storage__GBIingridients.Count > 0 ? source.Storage__GBIingridients.Max(rec => rec.Id) : 0;
+                source.Storage__GBIingridients.Add(new Storage__GBIingridient
+                {
+                    Id = ++maxId,
+                    StorageId = model.StorageId,
+                    GBIingridientId = model.GBIingridientId,
+                    Count = model.Count
+                });
+            }
         }
     }
 }

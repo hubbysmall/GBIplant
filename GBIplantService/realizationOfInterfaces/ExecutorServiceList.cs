@@ -21,48 +21,38 @@ namespace GBIplantService.realizationOfInterfaces
 
         public List<ExecutorViewModel> GetList()
         {
-            List<ExecutorViewModel> result = new List<ExecutorViewModel>();
-            for (int i = 0; i < source.Executors.Count; ++i)
-            {
-                result.Add(new ExecutorViewModel
+            List<ExecutorViewModel> result = source.Executors
+                .Select(rec => new ExecutorViewModel
                 {
-                    Id = source.Executors[i].Id,
-                    ExecutorFIO = source.Executors[i].ExecutorFIO
-                });
-            }
+                    Id = rec.Id,
+                    ExecutorFIO = rec.ExecutorFIO
+                })
+                .ToList();
             return result;
         }
 
         public ExecutorViewModel GetExecutor(int id)
         {
-            for (int i = 0; i < source.Executors.Count; ++i)
+            Executor element = source.Executors.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Executors[i].Id == id)
+                return new ExecutorViewModel
                 {
-                    return new ExecutorViewModel
-                    {
-                        Id = source.Executors[i].Id,
-                        ExecutorFIO = source.Executors[i].ExecutorFIO
-                    };
-                }
+                    Id = element.Id,
+                    ExecutorFIO = element.ExecutorFIO
+                };
             }
-            throw new Exception("Исполнитель не найден");
+            throw new Exception("Элемент не найден");
         }
 
         public void AddExecutor(ExecutorBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Executors.Count; ++i)
+            Executor element = source.Executors.FirstOrDefault(rec => rec.ExecutorFIO == model.ExecutorFIO);
+            if (element != null)
             {
-                if (source.Executors[i].Id > maxId)
-                {
-                    maxId = source.Executors[i].Id;
-                }
-                if (source.Executors[i].ExecutorFIO == model.ExecutorFIO)
-                {
-                    throw new Exception("Уже есть Исполнитель с таким ФИО");
-                }
+                throw new Exception("Уже есть сотрудник с таким ФИО");
             }
+            int maxId = source.Executors.Count > 0 ? source.Executors.Max(rec => rec.Id) : 0;
             source.Executors.Add(new Executor
             {
                 Id = maxId + 1,
@@ -72,37 +62,31 @@ namespace GBIplantService.realizationOfInterfaces
 
         public void UpdExecutor(ExecutorBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Executors.Count; ++i)
+            Executor element = source.Executors.FirstOrDefault(rec =>
+                                        rec.ExecutorFIO == model.ExecutorFIO && rec.Id != model.Id);
+            if (element != null)
             {
-                if (source.Executors[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.Executors[i].ExecutorFIO == model.ExecutorFIO &&
-                    source.Executors[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть Исполнитель с таким ФИО");
-                }
+                throw new Exception("Уже есть сотрудник с таким ФИО");
             }
-            if (index == -1)
+            element = source.Executors.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
-                throw new Exception("Исполнитель не найден");
+                throw new Exception("Элемент не найден");
             }
-            source.Executors[index].ExecutorFIO = model.ExecutorFIO;
+            element.ExecutorFIO = model.ExecutorFIO;
         }
 
         public void DelExecutor(int id)
         {
-            for (int i = 0; i < source.Executors.Count; ++i)
+            Executor element = source.Executors.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Executors[i].Id == id)
-                {
-                    source.Executors.RemoveAt(i);
-                    return;
-                }
+                source.Executors.Remove(element);
             }
-            throw new Exception("Исполнитель не найден");
+            else
+            {
+                throw new Exception("Элемент не найден");
+            }
         }
     }
 }

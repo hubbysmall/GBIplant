@@ -19,249 +19,169 @@ namespace GBIplantService.realizationOfInterfaces
             source = ALLDataListSingleton.GetInstance();
         }
 
-        public List<GBIpieceOfArtViewModel> GetList()
+         public List<GBIpieceOfArtViewModel> GetList()
         {
-            List<GBIpieceOfArtViewModel> result = new List<GBIpieceOfArtViewModel>();
-            for (int i = 0; i < source.GBIpieceOfArts.Count; ++i)
-            {
-                // требуется дополнительно получить список компонентов для изделия и их количество
-                List<GBIpieceofArt__ingridientViewModel> productComponents = new List<GBIpieceofArt__ingridientViewModel>();
-                for (int j = 0; j < source.GBIpieceofArt__ingridients.Count; ++j)
+            List<GBIpieceOfArtViewModel> result = source.GBIpieceOfArts
+                .Select(rec => new GBIpieceOfArtViewModel
                 {
-                    if (source.GBIpieceofArt__ingridients[j].GBIpieceOfArtId == source.GBIpieceOfArts[i].Id)
-                    {
-                        string componentName = string.Empty;
-                        for (int k = 0; k < source.GBIindgridients.Count; ++k)
-                        {
-                            if (source.GBIpieceofArt__ingridients[j].GBIindgridientId == source.GBIindgridients[k].Id)
+                    Id = rec.Id,
+                    GBIpieceOfArtName = rec.GBIpieceOfArtNAme,
+                    Price = rec.Price,
+                    GBIpieceofArt__ingridients = source.GBIpieceofArt__ingridients
+                            .Where(recPC => recPC.GBIpieceOfArtId == rec.Id)
+                            .Select(recPC => new GBIpieceofArt__ingridientViewModel
                             {
-                                componentName = source.GBIindgridients[k].GBIindgridientName;
-                                break;
-                            }
-                        }
-                        productComponents.Add(new GBIpieceofArt__ingridientViewModel
-                        {
-                            Id = source.GBIpieceofArt__ingridients[j].Id,
-                            GBIpieceofArtId = source.GBIpieceofArt__ingridients[j].GBIpieceOfArtId,
-                            GBIingridientId = source.GBIpieceofArt__ingridients[j].GBIindgridientId,
-                            GBIingridientName = componentName,
-                            Count = source.GBIpieceofArt__ingridients[j].Count
-                        });
-                    }
-                }
-                result.Add(new GBIpieceOfArtViewModel
-                {
-                    Id = source.GBIpieceOfArts[i].Id,
-                    GBIpieceOfArtName = source.GBIpieceOfArts[i].GBIpieceOfArtNAme,
-                    Price = source.GBIpieceOfArts[i].Price,
-                    GBIpieceofArt__ingridients = productComponents
-                });
-            }
+                                Id = recPC.Id,
+                                GBIpieceofArtId = recPC.GBIpieceOfArtId,
+                                GBIingridientId = recPC.GBIindgridientId,
+                                GBIingridientName = source.GBIindgridients
+                                    .FirstOrDefault(recC => recC.Id == recPC.GBIindgridientId).GBIindgridientName,   //?.GBIindgridientName
+                                Count = recPC.Count
+                            })
+                            .ToList()
+                })
+                .ToList();
             return result;
         }
 
-        public GBIpieceOfArtViewModel GetGBIpieceOfArt(int id)
+      public GBIpieceOfArtViewModel GetGBIpieceOfArt(int id)
         {
-            for (int i = 0; i < source.GBIpieceOfArts.Count; ++i)
+            GBIpieceOfArt element = source.GBIpieceOfArts.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                // требуется дополнительно получить список компонентов для изделия и их количество
-                List<GBIpieceofArt__ingridientViewModel> productComponents = new List<GBIpieceofArt__ingridientViewModel>();
-                for (int j = 0; j < source.GBIpieceofArt__ingridients.Count; ++j)
+                return new GBIpieceOfArtViewModel
                 {
-                    if (source.GBIpieceofArt__ingridients[j].GBIpieceOfArtId == source.GBIpieceOfArts[i].Id)
-                    {
-                        string componentName = string.Empty;
-                        for (int k = 0; k < source.GBIindgridients.Count; ++k)
-                        {
-                            if (source.GBIpieceofArt__ingridients[j].GBIindgridientId == source.GBIindgridients[k].Id)
+                    Id = element.Id,
+                    GBIpieceOfArtName = element.GBIpieceOfArtNAme,
+                    Price = element.Price,
+                    GBIpieceofArt__ingridients = source.GBIpieceofArt__ingridients
+                            .Where(recPC => recPC.GBIpieceOfArtId == element.Id)
+                            .Select(recPC => new GBIpieceofArt__ingridientViewModel
                             {
-                                componentName = source.GBIindgridients[k].GBIindgridientName;
-                                break;
-                            }
-                        }
-                        productComponents.Add(new GBIpieceofArt__ingridientViewModel
-                        {
-                            Id = source.GBIpieceofArt__ingridients[j].Id,
-                            GBIpieceofArtId = source.GBIpieceofArt__ingridients[j].GBIpieceOfArtId,
-                            GBIingridientId = source.GBIpieceofArt__ingridients[j].GBIindgridientId,
-                            GBIingridientName = componentName,
-                            Count = source.GBIpieceofArt__ingridients[j].Count
-                        });
-                    }
-                }
-                if (source.GBIpieceOfArts[i].Id == id)
-                {
-                    return new GBIpieceOfArtViewModel
-                    {
-                        Id = source.GBIpieceOfArts[i].Id,
-                        GBIpieceOfArtName = source.GBIpieceOfArts[i].GBIpieceOfArtNAme,
-                        Price = source.GBIpieceOfArts[i].Price,
-                        GBIpieceofArt__ingridients = productComponents
-                    };
-                }
-            }
-
-            throw new Exception("Элемент не найден");
-        }
-
-        public void AddGBIpieceOfArt(GBIpieceOfArtBindingModel model)
-        {
-            int maxId = 0;
-            for (int i = 0; i < source.GBIpieceOfArts.Count; ++i)
-            {
-                if (source.GBIpieceOfArts[i].Id > maxId)
-                {
-                    maxId = source.GBIpieceOfArts[i].Id;
-                }
-                if (source.GBIpieceOfArts[i].GBIpieceOfArtNAme == model.GBIpieceOfArtName)
-                {
-                    throw new Exception("Уже есть изделие с таким названием");
-                }
-            }
-            source.GBIpieceOfArts.Add(new GBIpieceOfArt
-            {
-                Id = maxId + 1,
-                GBIpieceOfArtNAme = model.GBIpieceOfArtName,
-                Price = model.Price
-            });
-            // компоненты для изделия
-            int maxPCId = 0;
-            for (int i = 0; i < source.GBIpieceofArt__ingridients.Count; ++i)
-            {
-                if (source.GBIpieceofArt__ingridients[i].Id > maxPCId)
-                {
-                    maxPCId = source.GBIpieceofArt__ingridients[i].Id;
-                }
-            }
-            // убираем дубли по компонентам
-            for (int i = 0; i < model.GBIpieceofArt__ingridients.Count; ++i)
-            {
-                for (int j = 1; j < model.GBIpieceofArt__ingridients.Count; ++j)
-                {
-                    if (model.GBIpieceofArt__ingridients[i].GBIingridientId ==
-                        model.GBIpieceofArt__ingridients[j].GBIingridientId)
-                    {
-                        model.GBIpieceofArt__ingridients[i].Count +=
-                            model.GBIpieceofArt__ingridients[j].Count;
-                        model.GBIpieceofArt__ingridients.RemoveAt(j--);
-                    }
-                }
-            }
-            // добавляем компоненты
-            for (int i = 0; i < model.GBIpieceofArt__ingridients.Count; ++i)
-            {
-                source.GBIpieceofArt__ingridients.Add(new GBIpieceofArt__ingridient
-                {
-                    Id = ++maxPCId,
-                    GBIpieceOfArtId = maxId + 1,
-                    GBIindgridientId = model.GBIpieceofArt__ingridients[i].GBIingridientId,
-                    Count = model.GBIpieceofArt__ingridients[i].Count
-                });
-            }
-        }
-
-        public void UpdGBIpieceOfArt(GBIpieceOfArtBindingModel model)
-        {
-            int index = -1;
-            for (int i = 0; i < source.GBIpieceOfArts.Count; ++i)
-            {
-                if (source.GBIpieceOfArts[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.GBIpieceOfArts[i].GBIpieceOfArtNAme == model.GBIpieceOfArtName &&
-                    source.GBIpieceOfArts[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть изделие с таким названием");
-                }
-            }
-            if (index == -1)
-            {
-                throw new Exception("Элемент не найден");
-            }
-            source.GBIpieceOfArts[index].GBIpieceOfArtNAme = model.GBIpieceOfArtName;
-            source.GBIpieceOfArts[index].Price = model.Price;
-            int maxPCId = 0;
-            for (int i = 0; i < source.GBIpieceofArt__ingridients.Count; ++i)
-            {
-                if (source.GBIpieceofArt__ingridients[i].Id > maxPCId)
-                {
-                    maxPCId = source.GBIpieceofArt__ingridients[i].Id;
-                }
-            }
-            // обновляем существуюущие компоненты
-            for (int i = 0; i < source.GBIpieceofArt__ingridients.Count; ++i)
-            {
-                if (source.GBIpieceofArt__ingridients[i].GBIpieceOfArtId == model.Id)
-                {
-                    bool flag = true;
-                    for (int j = 0; j < model.GBIpieceofArt__ingridients.Count; ++j)
-                    {
-                        // если встретили, то изменяем количество
-                        if (source.GBIpieceofArt__ingridients[i].Id == model.GBIpieceofArt__ingridients[j].Id)
-                        {
-                            source.GBIpieceofArt__ingridients[i].Count = model.GBIpieceofArt__ingridients[j].Count;
-                            flag = false;
-                            break;
-                        }
-                    }
-                    // если не встретили, то удаляем
-                    if(flag)
-                    {
-                        source.GBIpieceofArt__ingridients.RemoveAt(i--);
-                    }
-                }
-            }
-            // новые записи
-            for (int i = 0; i < model.GBIpieceofArt__ingridients.Count; ++i)
-            {
-                if (model.GBIpieceofArt__ingridients[i].Id == 0)
-                {
-                    // ищем дубли
-                    for (int j = 0; j < source.GBIpieceofArt__ingridients.Count; ++j)
-                    {
-                        if (source.GBIpieceofArt__ingridients[j].GBIpieceOfArtId == model.Id &&
-                            source.GBIpieceofArt__ingridients[j].GBIindgridientId == model.GBIpieceofArt__ingridients[i].GBIingridientId)
-                        {
-                            source.GBIpieceofArt__ingridients[j].Count += model.GBIpieceofArt__ingridients[i].Count;
-                            model.GBIpieceofArt__ingridients[i].Id = source.GBIpieceofArt__ingridients[j].Id;
-                            break;
-                        }
-                    }
-                    // если не нашли дубли, то новая запись
-                    if (model.GBIpieceofArt__ingridients[i].Id == 0)
-                    {
-                        source.GBIpieceofArt__ingridients.Add(new GBIpieceofArt__ingridient
-                        {
-                            Id = ++maxPCId,
-                            GBIpieceOfArtId = model.Id,
-                            GBIindgridientId = model.GBIpieceofArt__ingridients[i].GBIingridientId,
-                            Count = model.GBIpieceofArt__ingridients[i].Count
-                        });
-                    }
-                }
-            }
-        }
-
-        public void DelGBIpieceOfArt(int id)
-        {
-            // удаяем записи по компонентам при удалении изделия
-            for (int i = 0; i < source.GBIpieceofArt__ingridients.Count; ++i)
-            {
-                if (source.GBIpieceofArt__ingridients[i].GBIpieceOfArtId == id)
-                {
-                    source.GBIpieceofArt__ingridients.RemoveAt(i--);
-                }
-            }
-            for (int i = 0; i < source.GBIpieceOfArts.Count; ++i)
-            {
-                if (source.GBIpieceOfArts[i].Id == id)
-                {
-                    source.GBIpieceOfArts.RemoveAt(i);
-                    return;
-                }
+                                Id = recPC.Id,
+                                GBIpieceofArtId = recPC.GBIpieceOfArtId,
+                                GBIingridientId = recPC.GBIindgridientId,
+                                GBIingridientName = source.GBIindgridients
+                                        .FirstOrDefault(recC => recC.Id == recPC.GBIindgridientId).GBIindgridientName, //?.GBIindgridientName
+                                Count = recPC.Count
+                            })
+                            .ToList()
+                };
             }
             throw new Exception("Элемент не найден");
         }
+
+      public void AddGBIpieceOfArt(GBIpieceOfArtBindingModel model)
+      {
+          GBIpieceOfArt element = source.GBIpieceOfArts.FirstOrDefault(rec => rec.GBIpieceOfArtNAme == model.GBIpieceOfArtName);
+          if (element != null)
+          {
+              throw new Exception("Уже есть изделие с таким названием");
+          }
+          int maxId = source.GBIpieceOfArts.Count > 0 ? source.GBIpieceOfArts.Max(rec => rec.Id) : 0;
+          source.GBIpieceOfArts.Add(new GBIpieceOfArt
+          {
+              Id = maxId + 1,
+              GBIpieceOfArtNAme = model.GBIpieceOfArtName,
+              Price = model.Price
+          });
+          // компоненты для изделия
+          int maxPCId = source.GBIpieceofArt__ingridients.Count > 0 ?
+                                  source.GBIpieceofArt__ingridients.Max(rec => rec.Id) : 0;
+          // убираем дубли по компонентам
+          var groupComponents = model.GBIpieceofArt__ingridients
+                                      .GroupBy(rec => rec.GBIingridientId)
+                                      .Select(rec => new
+                                      {
+                                          ComponentId = rec.Key,
+                                          Count = rec.Sum(r => r.Count)
+                                      });
+          // добавляем компоненты
+          foreach (var groupComponent in groupComponents)
+          {
+              source.GBIpieceofArt__ingridients.Add(new GBIpieceofArt__ingridient
+              {
+                  Id = ++maxPCId,
+                  GBIpieceOfArtId = maxId + 1,
+                  GBIindgridientId = groupComponent.ComponentId,
+                  Count = groupComponent.Count
+              });
+          }
+      }
+
+      public void UpdGBIpieceOfArt(GBIpieceOfArtBindingModel model)
+      {
+          GBIpieceOfArt element = source.GBIpieceOfArts.FirstOrDefault(rec =>
+                                      rec.GBIpieceOfArtNAme == model.GBIpieceOfArtName && rec.Id != model.Id);
+          if (element != null)
+          {
+              throw new Exception("Уже есть изделие с таким названием");
+          }
+          element = source.GBIpieceOfArts.FirstOrDefault(rec => rec.Id == model.Id);
+          if (element == null)
+          {
+              throw new Exception("Элемент не найден");
+          }
+          element.GBIpieceOfArtNAme = model.GBIpieceOfArtName;
+          element.Price = model.Price;
+
+          int maxPCId = source.GBIpieceofArt__ingridients.Count > 0 ? source.GBIpieceofArt__ingridients.Max(rec => rec.Id) : 0;
+          // обновляем существуюущие компоненты
+          var compIds = model.GBIpieceofArt__ingridients.Select(rec => rec.GBIingridientId).Distinct();
+          var updateComponents = source.GBIpieceofArt__ingridients
+                                          .Where(rec => rec.GBIpieceOfArtId == model.Id &&
+                                         compIds.Contains(rec.GBIindgridientId));
+          foreach (var updateComponent in updateComponents)
+          {
+              updateComponent.Count = model.GBIpieceofArt__ingridients
+                                              .FirstOrDefault(rec => rec.Id == updateComponent.Id).Count;
+          }
+          source.GBIpieceofArt__ingridients.RemoveAll(rec => rec.GBIpieceOfArtId == model.Id &&
+                                     !compIds.Contains(rec.GBIindgridientId));
+          // новые записи
+          var groupComponents = model.GBIpieceofArt__ingridients
+                                      .Where(rec => rec.Id == 0)
+                                      .GroupBy(rec => rec.GBIingridientId)
+                                      .Select(rec => new
+                                      {
+                                          ComponentId = rec.Key,
+                                          Count = rec.Sum(r => r.Count)
+                                      });
+          foreach (var groupComponent in groupComponents)
+          {
+              GBIpieceofArt__ingridient elementPC = source.GBIpieceofArt__ingridients
+                                      .FirstOrDefault(rec => rec.GBIpieceOfArtId == model.Id &&
+                                                      rec.GBIindgridientId == groupComponent.ComponentId);
+              if (elementPC != null)
+              {
+                  elementPC.Count += groupComponent.Count;
+              }
+              else
+              {
+                  source.GBIpieceofArt__ingridients.Add(new GBIpieceofArt__ingridient
+                  {
+                      Id = ++maxPCId,
+                      GBIpieceOfArtId = model.Id,
+                      GBIindgridientId = groupComponent.ComponentId,
+                      Count = groupComponent.Count
+                  });
+              }
+          }
+      }
+
+      public void DelGBIpieceOfArt(int id)
+      {
+          GBIpieceOfArt element = source.GBIpieceOfArts.FirstOrDefault(rec => rec.Id == id);
+          if (element != null)
+          {
+              // удаяем записи по компонентам при удалении изделия
+              source.GBIpieceofArt__ingridients.RemoveAll(rec => rec.GBIpieceOfArtId == id);
+              source.GBIpieceOfArts.Remove(element);
+          }
+          else
+          {
+              throw new Exception("Элемент не найден");
+          }
+      }     
     }
 }

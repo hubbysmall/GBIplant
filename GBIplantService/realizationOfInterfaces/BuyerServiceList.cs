@@ -20,49 +20,39 @@ namespace GBIplantService.realizationOfInterfaces
         }
 
         public List<BuyerViewModel> GetList()
-        {
-            List<BuyerViewModel> result = new List<BuyerViewModel>();
-            for (int i = 0; i < source.Buyers.Count; ++i)
-            {
-                result.Add(new BuyerViewModel
+        {           
+            List<BuyerViewModel> result = source.Buyers
+                .Select(rec => new BuyerViewModel
                 {
-                    Id = source.Buyers[i].Id,
-                    BuyerFIO = source.Buyers[i].BuyerFIO
-                });
-            }
+                    Id = rec.Id,
+                    BuyerFIO = rec.BuyerFIO
+                })
+                .ToList();
             return result;
         }
 
         public BuyerViewModel GetBuyer(int id)
-        {
-            for (int i = 0; i < source.Buyers.Count; ++i)
+        {           
+            Buyer element = source.Buyers.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Buyers[i].Id == id)
+                return new BuyerViewModel
                 {
-                    return new BuyerViewModel
-                    {
-                        Id = source.Buyers[i].Id,
-                        BuyerFIO = source.Buyers[i].BuyerFIO
-                    };
-                }
+                    Id = element.Id,
+                    BuyerFIO = element.BuyerFIO
+                };
             }
-            throw new Exception("Покупатель не найден");
+            throw new Exception("Элемент не найден");
         }
 
         public void AddBuyer(BuyerBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Buyers.Count; ++i)
+            Buyer element = source.Buyers.FirstOrDefault(rec => rec.BuyerFIO == model.BuyerFIO);
+            if (element != null)
             {
-                if (source.Buyers[i].Id > maxId)
-                {
-                    maxId = source.Buyers[i].Id;
-                }
-                if (source.Buyers[i].BuyerFIO == model.BuyerFIO)
-                {
-                    throw new Exception("Уже есть покупатель с таким ФИО");
-                }
+                throw new Exception("Уже есть клиент с таким ФИО");
             }
+            int maxId = source.Buyers.Count > 0 ? source.Buyers.Max(rec => rec.Id) : 0;
             source.Buyers.Add(new Buyer
             {
                 Id = maxId + 1,
@@ -72,37 +62,39 @@ namespace GBIplantService.realizationOfInterfaces
 
         public void UpdBuyer(BuyerBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Buyers.Count; ++i)
+            Buyer element = source.Buyers.FirstOrDefault(rec =>
+                                    rec.BuyerFIO == model.BuyerFIO && rec.Id != model.Id);
+            if (element != null)
             {
-                if (source.Buyers[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.Buyers[i].BuyerFIO == model.BuyerFIO &&
-                    source.Buyers[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть покупатель с таким ФИО");
-                }
+                throw new Exception("Уже есть клиент с таким ФИО");
             }
-            if (index == -1)
+            element = source.Buyers.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
-                throw new Exception("Покупатель не найден");
+                throw new Exception("Элемент не найден");
             }
-            source.Buyers[index].BuyerFIO = model.BuyerFIO;
+            element.BuyerFIO = model.BuyerFIO;
         }
 
         public void DelBuyer(int id)
         {
-            for (int i = 0; i < source.Buyers.Count; ++i)
+            Buyer element = source.Buyers.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Buyers[i].Id == id)
-                {
-                    source.Buyers.RemoveAt(i);
-                    return;
-                }
+                source.Buyers.Remove(element);
             }
-            throw new Exception("Покупатель не найден");
+            else
+            {
+                throw new Exception("Элемент не найден");
+            }
         }
+
+        void qvert() {
+            List<BuyerViewModel> result = GetList();
+            IEnumerable<BuyerViewModel> query = from buyer in result where buyer.BuyerFIO == "client" select buyer;
+
+
+        }
+
     }
 }
