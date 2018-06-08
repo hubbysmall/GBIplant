@@ -40,7 +40,7 @@ namespace GBIplantService.realizationDB
             {
                 StorageName = stock.StorageName,
                 TotalCount = stockCompList.Sum(r => r.Count),
-                GBIingridients = stockCompList.Select(r => new Tuple<string, int>(r.GBIindgridient.GBIindgridientName, r.Count))
+                GBIingridients = stockCompList.Select(r => new StocksComponentLoadViewModel { GBIingridientname = r.GBIindgridient.GBIindgridientName, Count = r.Count }).ToList()
             })
                             .ToList();
         }
@@ -239,9 +239,9 @@ namespace GBIplantService.realizationDB
 
                             foreach (var listElem in elem.GBIingridients)
                             {
-                                excelcells.Value2 = listElem.Item1;
+                                excelcells.Value2 = listElem.GBIingridientname;
                                 excelcells.ColumnWidth = 10;
-                                excelcells.get_Offset(0, 1).Value2 = listElem.Item2;
+                                excelcells.get_Offset(0, 1).Value2 = listElem.Count;
                                 excelcells = excelcells.get_Offset(1, 0);
                             }
                         }

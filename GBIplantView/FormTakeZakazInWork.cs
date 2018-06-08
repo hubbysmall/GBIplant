@@ -10,29 +10,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+
 
 namespace GBIplantView
 {
     public partial class FormTakeZakazInWork : Form
     {
-         [Dependency]
-        public new IUnityContainer Container { get; set; }
-
+   
         public int Id { set { id = value; } }
-
-        private readonly IExecutorService serviceI;
-
-        private readonly IMainService serviceM;
 
         private int? id;
 
-        public FormTakeZakazInWork(IExecutorService serviceI, IMainService serviceM)
+        public FormTakeZakazInWork()
         {
             InitializeComponent();
-            this.serviceI = serviceI;
-            this.serviceM = serviceM;
         }
 
         private void FormTakeOrderInWork_Load(object sender, EventArgs e)
@@ -44,13 +35,21 @@ namespace GBIplantView
                     MessageBox.Show("Не указан заказ", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Close();
                 }
-                List<ExecutorViewModel> listI = serviceI.GetList();
-                if (listI != null)
+                var response = APIClient.GetRequest("api/Executor/GetList");
+                if (response.Result.IsSuccessStatusCode)
                 {
-                    comboBoxImplementer.DisplayMember = "ExecutorFIO";
-                    comboBoxImplementer.ValueMember = "Id";
-                    comboBoxImplementer.DataSource = listI;
-                    comboBoxImplementer.SelectedItem = null;
+                    List<ExecutorViewModel> list = APIClient.GetElement<List<ExecutorViewModel>>(response);
+                    if (list != null)
+                    {
+                        comboBoxImplementer.DisplayMember = "ExecutorFIO";
+                        comboBoxImplementer.ValueMember = "Id";
+                        comboBoxImplementer.DataSource = list;
+                        comboBoxImplementer.SelectedItem = null;
+                    }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
                 }
             }
             catch (Exception ex)
@@ -68,14 +67,21 @@ namespace GBIplantView
             }
             try
             {
-                serviceM.TakeZakazInWork(new ZakazBindingModel
+                var response = APIClient.PostRequest("api/Main/TakeOrderInWork", new ZakazBindingModel
                 {
                     Id = id.Value,
                     ExecutorId = Convert.ToInt32(comboBoxImplementer.SelectedValue)
                 });
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {

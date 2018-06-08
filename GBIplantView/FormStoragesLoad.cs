@@ -1,5 +1,6 @@
 ﻿using GBIplantService.BindingModels;
 using GBIplantService.Interfaces;
+using GBIplantService.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,32 +15,34 @@ namespace GBIplantView
 {
     public partial class FormStoragesLoad : Form
     {
-        private readonly IReportingService service;
-
-        public FormStoragesLoad(IReportingService service)
+    
+        public FormStoragesLoad()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormStoragesLoad_Load(object sender, EventArgs e)
         {
             try
             {
-                var dict = service.GetStorageLoad();
-                if (dict != null)
+                var response = APIClient.GetRequest("api/Reporting/GetStocksLoad");
+                if (response.Result.IsSuccessStatusCode)
                 {
                     dataGridView1.Rows.Clear();
-                    foreach (var elem in dict)
+                    foreach (var elem in APIClient.GetElement<List<StorageLoadViewModel>>(response))
                     {
                         dataGridView1.Rows.Add(new object[] { elem.StorageName, "", "" });
                         foreach (var listElem in elem.GBIingridients)
                         {
-                            dataGridView1.Rows.Add(new object[] { "", listElem.Item1, listElem.Item2 });
+                            dataGridView1.Rows.Add(new object[] { "", listElem.GBIingridientname, listElem.Count });
                         }
                         dataGridView1.Rows.Add(new object[] { "Итого", "", elem.TotalCount });
                         dataGridView1.Rows.Add(new object[] { });
                     }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
                 }
             }
             catch (Exception ex)
@@ -58,11 +61,18 @@ namespace GBIplantView
             {
                 try
                 {
-                    service.SaveStorageLoad(new ReportingBindingModel
+                    var response = APIClient.PostRequest("api/Reporting/SaveStocksLoad", new ReportingBindingModel
                     {
                         FileName = sfd.FileName
                     });
-                    MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
                 }
                 catch (Exception ex)
                 {

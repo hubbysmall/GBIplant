@@ -8,8 +8,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Lifetime;
+
 
 namespace GBIplantView
 {
@@ -21,24 +20,11 @@ namespace GBIplantView
         [STAThread]
         static void Main()
         {
-            var container = BuildUnityContainer();
+            APIClient.Connect();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(container.Resolve<FormMain>());
+            Application.Run(new FormMain());
         }
-        public static IUnityContainer BuildUnityContainer()
-        {
-            var currentContainer = new UnityContainer();
-            currentContainer.RegisterType<DbContext, AbstractDbContext>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IBuyerService, BuyerServiceDB>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IGBIingridientService, GBIingridientsServiceDB>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IExecutorService, ExecutorServiceDB>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IGBIpieceOfArtService, GBIpieceOfArtServiceDB>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IStorageService, StorageServiceBD>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IMainService, MainServiceDB>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IReportingService, ReportingServiceBD>(new HierarchicalLifetimeManager());
-
-            return currentContainer;
-        }
+        
     }
 }

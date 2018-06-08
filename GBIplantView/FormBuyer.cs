@@ -7,29 +7,25 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+
 
 namespace GBIplantView
 {
     public partial class FormBuyer : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
+       
         public int Id { set { id = value; } }
 
-        private readonly IBuyerService service;
-
+  
         private int? id;
 
-        public FormBuyer(IBuyerService service)
+        public FormBuyer()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormClient_Load(object sender, EventArgs e)
@@ -38,10 +34,15 @@ namespace GBIplantView
             {
                 try
                 {
-                    BuyerViewModel view = service.GetBuyer(id.Value);
-                    if (view != null)
+                    var response = APIClient.GetRequest("api/Buyer/Get/" + id.Value);
+                    if (response.Result.IsSuccessStatusCode)
                     {
-                        textBoxFIO.Text = view.BuyerFIO;
+                        var client = APIClient.GetElement<BuyerViewModel>(response);
+                        textBoxFIO.Text = client.BuyerFIO;
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
                     }
                 }
                 catch (Exception ex)
@@ -60,9 +61,10 @@ namespace GBIplantView
             }
             try
             {
+                Task<HttpResponseMessage> response;
                 if (id.HasValue)
                 {
-                    service.UpdBuyer(new BuyerBindingModel
+                    response = APIClient.PostRequest("api/Buyer/UpdElement", new BuyerBindingModel
                     {
                         Id = id.Value,
                         BuyerFIO = textBoxFIO.Text
@@ -70,14 +72,21 @@ namespace GBIplantView
                 }
                 else
                 {
-                    service.AddBuyer(new BuyerBindingModel
+                    response = APIClient.PostRequest("api/Buyer/AddElement", new BuyerBindingModel
                     {
                         BuyerFIO = textBoxFIO.Text
                     });
                 }
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {

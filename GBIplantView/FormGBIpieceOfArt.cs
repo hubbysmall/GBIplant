@@ -7,31 +7,28 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+
 
 namespace GBIplantView
 {
     public partial class FormGBIpieceOfArt : Form
     {
-       [Dependency]
-        public new IUnityContainer Container { get; set; }
+ 
 
         public int Id { set { id = value; } }
 
-        private readonly IGBIpieceOfArtService service;
 
         private int? id;
 
         private List<GBIpieceofArt__ingridientViewModel> productComponents;
 
-        public FormGBIpieceOfArt(IGBIpieceOfArtService service)
+        public FormGBIpieceOfArt()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormProduct_Load(object sender, EventArgs e)
@@ -40,13 +37,18 @@ namespace GBIplantView
             {
                 try
                 {
-                    GBIpieceOfArtViewModel view = service.GetGBIpieceOfArt(id.Value);
-                    if (view != null)
+                    var response = APIClient.GetRequest("api/GBIpieceofArt/Get/" + id.Value);
+                    if (response.Result.IsSuccessStatusCode)
                     {
-                        textBoxName.Text = view.GBIpieceOfArtName;
-                        textBoxPrice.Text = view.Price.ToString();
-                        productComponents = view.GBIpieceofArt__ingridients;
+                        var product = APIClient.GetElement<GBIpieceOfArtViewModel>(response);
+                        textBoxName.Text = product.GBIpieceOfArtName;
+                        textBoxPrice.Text = product.Price.ToString();
+                        productComponents = product.GBIpieceofArt__ingridients;
                         LoadData();
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
                     }
                 }
                 catch (Exception ex)
@@ -82,7 +84,7 @@ namespace GBIplantView
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormGBIpieceOfArt__ingridient>();
+            var form = new FormGBIpieceOfArt__ingridient();
             if (form.ShowDialog() == DialogResult.OK)
             {
                 if(form.Model != null)
@@ -101,7 +103,7 @@ namespace GBIplantView
         {
             if (dataGridView.SelectedRows.Count == 1)
             {
-                var form = Container.Resolve<FormGBIpieceOfArt__ingridient>();
+                var form = new FormGBIpieceOfArt__ingridient();
                 form.Model = productComponents[dataGridView.SelectedRows[0].Cells[0].RowIndex];
                 if (form.ShowDialog() == DialogResult.OK)
                 {
@@ -165,9 +167,10 @@ namespace GBIplantView
                         Count = productComponents[i].Count
                     });
                 }
+                Task<HttpResponseMessage> response;
                 if (id.HasValue)
                 {
-                    service.UpdGBIpieceOfArt(new GBIpieceOfArtBindingModel
+                    response = APIClient.PostRequest("api/GBIpieceofArt/UpdElement", new GBIpieceOfArtBindingModel
                     {
                         Id = id.Value,
                         GBIpieceOfArtName = textBoxName.Text,
@@ -177,16 +180,23 @@ namespace GBIplantView
                 }
                 else
                 {
-                    service.AddGBIpieceOfArt(new GBIpieceOfArtBindingModel
+                    response = APIClient.PostRequest("api/GBIpieceofArt/AddElement", new GBIpieceOfArtBindingModel
                     {
                         GBIpieceOfArtName = textBoxName.Text,
                         Price = Convert.ToInt32(textBoxPrice.Text),
                         GBIpieceofArt__ingridients = productComponentBM
                     });
                 }
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {
