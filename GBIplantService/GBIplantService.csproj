@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F48DD22F-8200-4FAE-8F92-A38AE0C1D44D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GBIplantService</RootNamespace>
+    <AssemblyName>GBIplantService</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ALLDataListSingleton.cs" />
+    <Compile Include="BindingModels\BuyerBindingModel.cs" />
+    <Compile Include="BindingModels\ExecutorBindingModel.cs" />
+    <Compile Include="BindingModels\GBIingridientBindingModel.cs" />
+    <Compile Include="BindingModels\GBIpieceOfArtBindingModel.cs" />
+    <Compile Include="BindingModels\GBIpieceofArt__ingridientBindingModel.cs" />
+    <Compile Include="BindingModels\StorageBindingModel.cs" />
+    <Compile Include="BindingModels\Storage__GBIingridientBindingModel.cs" />
+    <Compile Include="BindingModels\ZakazBindingModel.cs" />
+    <Compile Include="Interfaces\IBuyerService.cs" />
+    <Compile Include="Interfaces\IExecutorService.cs" />
+    <Compile Include="Interfaces\IGBIingridientService.cs" />
+    <Compile Include="Interfaces\IGBIpieceOfArtService.cs" />
+    <Compile Include="Interfaces\IMainService.cs" />
+    <Compile Include="Interfaces\IStorageService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="realizationOfInterfaces\BuyerServiceList.cs" />
+    <Compile Include="realizationOfInterfaces\ExecutorServiceList.cs" />
+    <Compile Include="realizationOfInterfaces\GBIingridientsServiceList.cs" />
+    <Compile Include="realizationOfInterfaces\GBIpieceOfArtServiceList.cs" />
+    <Compile Include="realizationOfInterfaces\MainServiceList.cs" />
+    <Compile Include="realizationOfInterfaces\StorageServiceList.cs" />
+    <Compile Include="ViewModels\BuyerViewModel.cs" />
+    <Compile Include="ViewModels\ExecutorViewModel.cs" />
+    <Compile Include="ViewModels\GBIingridientViewModel.cs" />
+    <Compile Include="ViewModels\GBIpieceOfArtViewModel.cs" />
+    <Compile Include="ViewModels\GBIpieceofArt__ingridientViewModel.cs" />
+    <Compile Include="ViewModels\StorageViewModel.cs" />
+    <Compile Include="ViewModels\Storage__GBIingridientViewModel.cs" />
+    <Compile Include="ViewModels\ZakazViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GBIplantModel\GBIplantModel.csproj">
+      <Project>{be225f1b-4014-4a75-a1f1-2d8e4e0845b4}</Project>
+      <Name>GBIplantModel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
