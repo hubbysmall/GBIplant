@@ -20,12 +20,7 @@ namespace GBIplantView
         {
             InitializeComponent();
         }
-
-        private void FormMain_Load(object sender, EventArgs e)
-        {
-
-        }
-       
+        
         private void LoadData()
         {
             try
