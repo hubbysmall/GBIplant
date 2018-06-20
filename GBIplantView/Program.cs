@@ -1,7 +1,10 @@
-﻿using GBIplantService.Interfaces;
+﻿using GBIplantService;
+using GBIplantService.Interfaces;
+using GBIplantService.realizationDB;
 using GBIplantService.realizationOfInterfaces;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -26,12 +29,13 @@ namespace GBIplantView
         public static IUnityContainer BuildUnityContainer()
         {
             var currentContainer = new UnityContainer();
-            currentContainer.RegisterType<IBuyerService, BuyerServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IGBIingridientService, GBIingridientsServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IExecutorService, ExecutorServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IGBIpieceOfArtService, GBIpieceOfArtServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IStorageService, StorageServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IMainService, MainServiceList>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<DbContext, AbstractDbContext>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IBuyerService, BuyerServiceDB>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IGBIingridientService, GBIingridientsServiceDB>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IExecutorService, ExecutorServiceDB>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IGBIpieceOfArtService, GBIpieceOfArtServiceDB>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IStorageService, StorageServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IMainService, MainServiceDB>(new HierarchicalLifetimeManager());
 
             return currentContainer;
         }
