@@ -15,6 +15,8 @@ using Unity.Attributes;
 
 namespace GBIplantView
 {  
+    public partial class FormMain : Form
+    {
         [Dependency]
         public new IUnityContainer Container { get; set; }
 
