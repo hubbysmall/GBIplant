@@ -16,10 +16,6 @@ namespace GBIplantView
 {
     public partial class FormMain : Form
     {
-        private void FormMain_Load(object sender, EventArgs e)
-        {
-
-        }
         [Dependency]
         public new IUnityContainer Container { get; set; }
 
