@@ -17,10 +17,6 @@ namespace GBIplantView
 {
     public partial class FormBuyers : Form
     {
-        /*public FormBuyers()
-        {
-            InitializeComponent();
-        }*/
         [Dependency]
         public new IUnityContainer Container { get; set; }
 
