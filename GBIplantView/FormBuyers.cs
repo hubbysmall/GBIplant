@@ -19,6 +19,16 @@ namespace GBIplantView
         public FormBuyers()
         {
             InitializeComponent();
+    {        
+        [Dependency]
+        public new IUnityContainer Container { get; set; }
+
+        private readonly IBuyerService service;
+
+        public FormBuyers(IBuyerService service)
+        {
+            InitializeComponent();
+            this.service = service;
         }
         
 
