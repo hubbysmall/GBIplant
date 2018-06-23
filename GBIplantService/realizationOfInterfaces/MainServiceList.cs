@@ -30,7 +30,6 @@ namespace GBIplantService.realizationOfInterfaces
                     ExecutorId = rec.ExecutorId,
                     DateCreate = rec.DateCreate.ToLongDateString(),
                     DateExecute = rec.DateCreate.ToLongDateString(),
-                    //DateExecute = rec.DateExecute?.ToLongDateString(),
                     Status = rec.Status.ToString(),
                     Count = rec.Count,
                     Sum = rec.Sum,
