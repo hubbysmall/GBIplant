@@ -19,5 +19,7 @@ namespace GBIplantService.Interfaces
         void UpdGBIpieceOfArt(GBIpieceOfArtBindingModel model);
 
         void DelGBIpieceOfArt(int id);
+
+        List<GBIpieceofArt__ingridientViewModel> GetListOfComps(int id);
     }
 }
