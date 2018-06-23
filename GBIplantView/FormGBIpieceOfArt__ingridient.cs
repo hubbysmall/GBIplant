@@ -29,24 +29,19 @@ namespace GBIplantView
 
         private void FormProductComponent_Load(object sender, EventArgs e)
         {
-           
-             try
+            try
             {
-                var response = APIClient.GetRequest("api/GBIingridient/GetList");
-                if (response.Result.IsSuccessStatusCode)
-                {
-                    comboBoxComponent.DisplayMember = "GBIingridientName";
-                    comboBoxComponent.ValueMember = "Id";
-                    comboBoxComponent.DataSource = APIClient.GetElement<List<GBIingridientViewModel>>(response);
-                    comboBoxComponent.SelectedItem = null;
-                }
-                else
-                {
-                    throw new Exception(APIClient.GetError(response));
-                }
+                comboBoxComponent.DisplayMember = "GBIingridientName";
+                comboBoxComponent.ValueMember = "Id";
+                comboBoxComponent.DataSource = Task.Run(() => APIClient.GetRequestData<List<GBIingridientViewModel>>("api/GBIingridient/GetList")).Result;
+                comboBoxComponent.SelectedItem = null;
             }
             catch (Exception ex)
             {
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             if (model != null)
@@ -96,7 +91,6 @@ namespace GBIplantView
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
             Close();
         }
     }

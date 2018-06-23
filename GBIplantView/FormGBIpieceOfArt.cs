@@ -37,22 +37,18 @@ namespace GBIplantView
             {
                 try
                 {
-                    var response = APIClient.GetRequest("api/GBIpieceofArt/Get/" + id.Value);
-                    if (response.Result.IsSuccessStatusCode)
-                    {
-                        var product = APIClient.GetElement<GBIpieceOfArtViewModel>(response);
-                        textBoxName.Text = product.GBIpieceOfArtName;
-                        textBoxPrice.Text = product.Price.ToString();
-                        productComponents = product.GBIpieceofArt__ingridients;
-                        LoadData();
-                    }
-                    else
-                    {
-                        throw new Exception(APIClient.GetError(response));
-                    }
+                    var product = Task.Run(() => APIClient.GetRequestData<GBIpieceOfArtViewModel>("api/GBIpieceofArt/Get/" + id.Value)).Result;
+                    textBoxName.Text = product.GBIpieceOfArtName;
+                    textBoxPrice.Text = product.Price.ToString();
+                    productComponents = product.GBIpieceofArt__ingridients;
+                    LoadData();
                 }
                 catch (Exception ex)
                 {
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                    }
                     MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -154,59 +150,57 @@ namespace GBIplantView
                 MessageBox.Show("Заполните компоненты", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            try
+            List<GBIpieceofArt__ingridientBindingModel> productComponentBM = new List<GBIpieceofArt__ingridientBindingModel>();
+            for (int i = 0; i < productComponents.Count; ++i)
             {
-                List<GBIpieceofArt__ingridientBindingModel> productComponentBM = new List<GBIpieceofArt__ingridientBindingModel>();
-                for (int i = 0; i < productComponents.Count; ++i)
+                productComponentBM.Add(new GBIpieceofArt__ingridientBindingModel
                 {
-                    productComponentBM.Add(new GBIpieceofArt__ingridientBindingModel
-                    {
-                        Id = productComponents[i].Id,
-                        GBIpieceofArtId = productComponents[i].GBIpieceofArtId,
-                        GBIingridientId = productComponents[i].GBIingridientId,
-                        Count = productComponents[i].Count
-                    });
-                }
-                Task<HttpResponseMessage> response;
-                if (id.HasValue)
-                {
-                    response = APIClient.PostRequest("api/GBIpieceofArt/UpdElement", new GBIpieceOfArtBindingModel
-                    {
-                        Id = id.Value,
-                        GBIpieceOfArtName = textBoxName.Text,
-                        Price = Convert.ToInt32(textBoxPrice.Text),
-                        GBIpieceofArt__ingridients = productComponentBM
-                    });
-                }
-                else
-                {
-                    response = APIClient.PostRequest("api/GBIpieceofArt/AddElement", new GBIpieceOfArtBindingModel
-                    {
-                        GBIpieceOfArtName = textBoxName.Text,
-                        Price = Convert.ToInt32(textBoxPrice.Text),
-                        GBIpieceofArt__ingridients = productComponentBM
-                    });
-                }
-                if (response.Result.IsSuccessStatusCode)
-                {
-                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    DialogResult = DialogResult.OK;
-                    Close();
-                }
-                else
-                {
-                    throw new Exception(APIClient.GetError(response));
-                }
+                    Id = productComponents[i].Id,
+                    GBIpieceofArtId = productComponents[i].GBIpieceofArtId,
+                    GBIingridientId = productComponents[i].GBIingridientId,
+                    Count = productComponents[i].Count
+                });
             }
-            catch (Exception ex)
+            string name = textBoxName.Text;
+            int price = Convert.ToInt32(textBoxPrice.Text);
+            Task task;
+            if (id.HasValue)
             {
+                task = Task.Run(() => APIClient.PostRequestData("api/GBIpieceofArt/UpdElement", new GBIpieceOfArtBindingModel
+                {
+                    Id = id.Value,
+                    GBIpieceOfArtName = name,
+                    Price = price,
+                    GBIpieceofArt__ingridients = productComponentBM
+                }));
+            }
+            else
+            {
+                task = Task.Run(() => APIClient.PostRequestData("api/GBIpieceofArt/AddElement", new GBIpieceOfArtBindingModel
+                {
+                    GBIpieceOfArtName = name,
+                    Price = price,
+                    GBIpieceofArt__ingridients = productComponentBM
+                }));
+            }
+
+            task.ContinueWith((prevTask) => MessageBox.Show("Сохранение прошло успешно. Обновите список", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information),
+                TaskContinuationOptions.OnlyOnRanToCompletion);
+            task.ContinueWith((prevTask) =>
+            {
+                var ex = (Exception)prevTask.Exception;
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+
+            Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
             Close();
         }
     }
