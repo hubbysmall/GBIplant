@@ -1,4 +1,5 @@
-﻿using GBIplantService.BindingModels;
+﻿using GBIplantRESTapi.Services;
+using GBIplantService.BindingModels;
 using GBIplantService.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -57,6 +58,18 @@ namespace GBIplantRESTapi.Controllers
         public void PutComponentOnStock(Storage__GBIingridientBindingModel model)
         {
             _service.PutGBIingridientInStorage(model);
+        }
+
+        [HttpGet]
+        public IHttpActionResult GetInfo()
+        {
+            ReflectionService service = new ReflectionService();
+            var list = service.GetInfoByAssembly();
+            if (list == null)
+            {
+                InternalServerError(new Exception("Нет данных"));
+            }
+            return Ok(list);
         }
     }
 }

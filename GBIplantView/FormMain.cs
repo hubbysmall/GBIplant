@@ -164,7 +164,6 @@ namespace GBIplantView
         {
             LoadData();
         }
-        
         private void Прайс_лист_ЖБИ_изделийToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog

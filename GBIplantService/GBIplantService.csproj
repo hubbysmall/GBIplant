@@ -93,6 +93,8 @@
   <ItemGroup>
     <Compile Include="AbstractDbContext.cs" />
     <Compile Include="ALLDataListSingleton.cs" />
+    <Compile Include="Attributes\CustomInterfaceAttribute.cs" />
+    <Compile Include="Attributes\CustomMethodAttribute.cs" />
     <Compile Include="BindingModels\BuyerBindingModel.cs" />
     <Compile Include="BindingModels\ExecutorBindingModel.cs" />
     <Compile Include="BindingModels\GBIingridientBindingModel.cs" />
@@ -111,13 +113,17 @@
     <Compile Include="Interfaces\IMessageInfoService.cs" />
     <Compile Include="Interfaces\IReportingService.cs" />
     <Compile Include="Interfaces\IStorageService.cs" />
-    <Compile Include="Migrations\201806080736491_Migr.cs" />
-    <Compile Include="Migrations\201806080736491_Migr.Designer.cs">
-      <DependentUpon>201806080736491_Migr.cs</DependentUpon>
+    <Compile Include="Migrations\201803301532198_MyMigra.cs" />
+    <Compile Include="Migrations\201803301532198_MyMigra.Designer.cs">
+      <DependentUpon>201803301532198_MyMigra.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201806080744178_Migr2.cs" />
-    <Compile Include="Migrations\201806080744178_Migr2.Designer.cs">
-      <DependentUpon>201806080744178_Migr2.cs</DependentUpon>
+    <Compile Include="Migrations\201805251419159_newFieldInBuyerAndModelMessageInfo.cs" />
+    <Compile Include="Migrations\201805251419159_newFieldInBuyerAndModelMessageInfo.Designer.cs">
+      <DependentUpon>201805251419159_newFieldInBuyerAndModelMessageInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201805251824496_test.cs" />
+    <Compile Include="Migrations\201805251824496_test.Designer.cs">
+      <DependentUpon>201805251824496_test.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -166,11 +172,14 @@
     <None Include="Resources\TIMCYR.TTF" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201806080736491_Migr.resx">
-      <DependentUpon>201806080736491_Migr.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201803301532198_MyMigra.resx">
+      <DependentUpon>201803301532198_MyMigra.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201806080744178_Migr2.resx">
-      <DependentUpon>201806080744178_Migr2.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201805251419159_newFieldInBuyerAndModelMessageInfo.resx">
+      <DependentUpon>201805251419159_newFieldInBuyerAndModelMessageInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201805251824496_test.resx">
+      <DependentUpon>201805251824496_test.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -1,4 +1,5 @@
-﻿using GBIplantService.BindingModels;
+﻿using GBIplantService.Attributes;
+using GBIplantService.BindingModels;
 using GBIplantService.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -8,16 +9,18 @@ using System.Threading.Tasks;
 
 namespace GBIplantService.Interfaces
 {
-   public interface IGBIingridientService
+    [CustomInterface("Интерфейс для работы с компонентами")]
+    public interface IGBIingridientService
     {
-       List<GBIingridientViewModel> GetList();
-
-       GBIingridientViewModel GetGBIingridient(int id);
-
-       void AddGBIingridient(GBIingridientBindingModel model);
-
-       void UpdGBIingridient(GBIingridientBindingModel model);
-
-       void DelGBIingridient(int id);
+        [CustomMethod("Метод получения списка компонент")]
+        List<GBIingridientViewModel> GetList();
+        [CustomMethod("Метод получения компонента по id")]
+        GBIingridientViewModel GetGBIingridient(int id);
+        [CustomMethod("Метод добавления компонента")]
+        void AddGBIingridient(GBIingridientBindingModel model);
+        [CustomMethod("Метод изменения данных по компоненту")]
+        void UpdGBIingridient(GBIingridientBindingModel model);
+        [CustomMethod("Метод удаления компонента")]
+        void DelGBIingridient(int id);
     }
 }
