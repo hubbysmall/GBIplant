@@ -7,30 +7,25 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+
 
 
 namespace GBIplantView
 {
     public partial class FormGBIingridient : Form
     {
-       [Dependency]
-        public new IUnityContainer Container { get; set; }
 
         public int Id { set { id = value; } }
 
-        private readonly IGBIingridientService service;
-
         private int? id;
 
-        public FormGBIingridient(IGBIingridientService service)
+        public FormGBIingridient()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormComponent_Load(object sender, EventArgs e)
@@ -39,10 +34,15 @@ namespace GBIplantView
             {
                 try
                 {
-                    GBIingridientViewModel view = service.GetGBIingridient(id.Value);
-                    if (view != null)
+                    var response = APIClient.GetRequest("api/GBIingridient/Get/" + id.Value);
+                    if (response.Result.IsSuccessStatusCode)
                     {
-                        textBoxName.Text = view.GBIingridientName;
+                        var component = APIClient.GetElement<GBIingridientViewModel>(response);
+                        textBoxName.Text = component.GBIingridientName;
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
                     }
                 }
                 catch (Exception ex)
@@ -61,9 +61,10 @@ namespace GBIplantView
             }
             try
             {
+                Task<HttpResponseMessage> response;
                 if (id.HasValue)
                 {
-                    service.UpdGBIingridient(new GBIingridientBindingModel
+                    response = APIClient.PostRequest("api/GBIingridient/UpdElement", new GBIingridientBindingModel
                     {
                         Id = id.Value,
                         GBIingridient = textBoxName.Text
@@ -71,15 +72,23 @@ namespace GBIplantView
                 }
                 else
                 {
-                    service.AddGBIingridient(new GBIingridientBindingModel
+                    response = APIClient.PostRequest("api/GBIingridient/AddElement", new GBIingridientBindingModel
                     {
                         GBIingridient = textBoxName.Text
                     });
                 }
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
+         
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);

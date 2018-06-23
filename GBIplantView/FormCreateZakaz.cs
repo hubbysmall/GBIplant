@@ -10,50 +10,56 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+
 
 
 namespace GBIplantView
 {
     public partial class FormCreateZakaz : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
+      
 
-        private readonly IBuyerService serviceC;
-
-        private readonly IGBIpieceOfArtService serviceP;
-
-        private readonly IMainService serviceM;
-
-        public FormCreateZakaz(IBuyerService serviceC, IGBIpieceOfArtService serviceP, IMainService serviceM)
+        public FormCreateZakaz()
         {
             InitializeComponent();
-            this.serviceC = serviceC;
-            this.serviceP = serviceP;
-            this.serviceM = serviceM;
         }
 
         private void FormCreateOrder_Load(object sender, EventArgs e)
         {
+
             try
             {
-                List<BuyerViewModel> listC = serviceC.GetList();
-                if (listC != null)
+                var responseC = APIClient.GetRequest("api/Buyer/GetList");
+                if (responseC.Result.IsSuccessStatusCode)
                 {
-                    comboBoxClient.DisplayMember = "BuyerFIO";
-                    comboBoxClient.ValueMember = "Id";
-                    comboBoxClient.DataSource = listC;
-                    comboBoxClient.SelectedItem = null;
+                    List<BuyerViewModel> list = APIClient.GetElement<List<BuyerViewModel>>(responseC);
+                    if (list != null)
+                    {
+                        comboBoxClient.DisplayMember = "BuyerFIO";
+                        comboBoxClient.ValueMember = "Id";
+                        comboBoxClient.DataSource = list; // listC  ?????
+                        comboBoxClient.SelectedItem = null;
+                    }
                 }
-                List<GBIpieceOfArtViewModel> listP = serviceP.GetList();
-                if (listP != null)
+                else
                 {
-                    comboBoxProduct.DisplayMember = "GBIpieceOfArtName";
-                    comboBoxProduct.ValueMember = "Id";
-                    comboBoxProduct.DataSource = listP;
-                    comboBoxProduct.SelectedItem = null;
+                    throw new Exception(APIClient.GetError(responseC));
+                }
+                var responseP = APIClient.GetRequest("api/GBIpieceOfArt/GetList");
+                if (responseP.Result.IsSuccessStatusCode)
+                {
+                    List<GBIpieceOfArtViewModel> list = APIClient.GetElement<List<GBIpieceOfArtViewModel>>(responseP);
+                    if (list != null)
+                    {
+                        comboBoxProduct.DisplayMember = "GBIpieceOfArtName";
+                        comboBoxProduct.ValueMember = "Id";
+                        comboBoxProduct.DataSource = list; // listP  ?????
+                        comboBoxProduct.SelectedItem = null;
+                    }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(responseP));
                 }
             }
             catch (Exception ex)
@@ -66,14 +72,23 @@ namespace GBIplantView
         {
             if (comboBoxProduct.SelectedValue != null && !string.IsNullOrEmpty(textBoxCount.Text))
             {
-                try
+             
+                 try
                 {
                     int id = Convert.ToInt32(comboBoxProduct.SelectedValue);
-                    GBIpieceOfArtViewModel product = serviceP.GetGBIpieceOfArt(id);
-                    int count = Convert.ToInt32(textBoxCount.Text);
-                    textBoxSum.Text = (count * product.Price).ToString();
+                    var responseP = APIClient.GetRequest("api/GBIpieceOfArt/Get/" + id);
+                    if (responseP.Result.IsSuccessStatusCode)
+                    {
+                        GBIpieceOfArtViewModel product = APIClient.GetElement<GBIpieceOfArtViewModel>(responseP);
+                        int count = Convert.ToInt32(textBoxCount.Text);
+                        textBoxSum.Text = (count * (int)product.Price).ToString();
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(responseP));
+                    }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -109,16 +124,23 @@ namespace GBIplantView
             }
             try
             {
-                serviceM.CreateZakaz(new ZakazBindingModel
+                var response = APIClient.PostRequest("api/Main/CreateOrder", new ZakazBindingModel
                 {
                     BuyerId = Convert.ToInt32(comboBoxClient.SelectedValue),
                     GBIpieceOfArtId = Convert.ToInt32(comboBoxProduct.SelectedValue),
                     Count = Convert.ToInt32(textBoxCount.Text),
                     Sum = Convert.ToInt32(textBoxSum.Text)
                 });
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {

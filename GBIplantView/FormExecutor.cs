@@ -7,29 +7,25 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace GBIplantView
 {
     public partial class FormExecutor : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
+        
 
         public int Id { set { id = value; } }
 
-        private readonly IExecutorService service;
 
         private int? id;
 
-        public FormExecutor(IExecutorService service)
+        public FormExecutor()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormImplementer_Load(object sender, EventArgs e)
@@ -38,12 +34,17 @@ namespace GBIplantView
             {
                 try
                 {
-                    ExecutorViewModel view = service.GetExecutor(id.Value);
-                    if (view != null)
+                    var response = APIClient.GetRequest("api/Executor/Get/" + id.Value);
+                    if (response.Result.IsSuccessStatusCode)
                     {
-                        textBoxFIO.Text = view.ExecutorFIO;
+                        var implementer = APIClient.GetElement<ExecutorViewModel>(response);
+                        textBoxFIO.Text = implementer.ExecutorFIO;
                     }
-                }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
+                }              
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -60,9 +61,10 @@ namespace GBIplantView
             }
             try
             {
+                Task<HttpResponseMessage> response;
                 if (id.HasValue)
                 {
-                    service.UpdExecutor(new ExecutorBindingModel
+                    response = APIClient.PostRequest("api/Executor/UpdElement", new ExecutorBindingModel
                     {
                         Id = id.Value,
                         ExecutorFIO = textBoxFIO.Text
@@ -70,14 +72,21 @@ namespace GBIplantView
                 }
                 else
                 {
-                    service.AddExecutor(new ExecutorBindingModel
+                    response = APIClient.PostRequest("api/Executor/AddElement", new ExecutorBindingModel
                     {
                         ExecutorFIO = textBoxFIO.Text
                     });
                 }
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {

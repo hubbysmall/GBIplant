@@ -1,5 +1,6 @@
 ﻿using GBIplantService.BindingModels;
 using GBIplantService.Interfaces;
+using GBIplantService.ViewModels;
 using Microsoft.Reporting.WinForms;
 using System;
 using System.Collections.Generic;
@@ -15,12 +16,11 @@ namespace GBIplantView
 {
     public partial class FormBuyerZakazes : Form
     {
-        private readonly IReportingService service;
+        
 
-        public FormBuyerZakazes(IReportingService service)
+        public FormBuyerZakazes()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormBuyerZakazes_Load(object sender, EventArgs e)
@@ -49,13 +49,21 @@ namespace GBIplantView
                                             " по " + dateTimePickerTo.Value.ToShortDateString());
                 reportViewer3.LocalReport.SetParameters(parameter);
 
-                var dataSource = service.GetBuyerZakazes(new ReportingBindingModel
+                var response = APIClient.PostRequest("api/Reporting/GetClientOrders", new ReportingBindingModel
                 {
                     DateFrom = dateTimePickerFrom.Value,
                     DateTo = dateTimePickerTo.Value
                 });
-                ReportDataSource source = new ReportDataSource("DataSetZakazes", dataSource);
-                reportViewer3.LocalReport.DataSources.Add(source);
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    var dataSource = APIClient.GetElement<List<BuyerZakazesViewModel>>(response);
+                    ReportDataSource source = new ReportDataSource("DataSetOrders", dataSource);
+                    reportViewer3.LocalReport.DataSources.Add(source);
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
 
                 reportViewer3.RefreshReport();
             }
@@ -80,13 +88,20 @@ namespace GBIplantView
             {
                 try
                 {
-                    service.SaveBuyerZakazes(new ReportingBindingModel
+                    var response = APIClient.PostRequest("api/Reporting/SaveClientOrders", new ReportingBindingModel
                     {
                         FileName = sfd.FileName,
                         DateFrom = dateTimePickerFrom.Value,
                         DateTo = dateTimePickerTo.Value
                     });
-                    MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
                 }
                 catch (Exception ex)
                 {

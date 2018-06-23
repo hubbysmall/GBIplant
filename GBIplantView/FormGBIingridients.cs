@@ -1,4 +1,5 @@
-﻿using GBIplantService.Interfaces;
+﻿using GBIplantService.BindingModels;
+using GBIplantService.Interfaces;
 using GBIplantService.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -9,22 +10,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace GBIplantView
 {
     public partial class FormGBIingridients : Form
     {
-       [Dependency]
-        public new IUnityContainer Container { get; set; }
 
-       private readonly IGBIingridientService service;
 
-       public FormGBIingridients(IGBIingridientService service)
+       public FormGBIingridients()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormComponents_Load(object sender, EventArgs e)
@@ -36,12 +31,20 @@ namespace GBIplantView
         {
             try
             {
-                List<GBIingridientViewModel> list = service.GetList();
-                if (list != null)
+                var response = APIClient.GetRequest("api/GBIingridient/GetList");
+                if (response.Result.IsSuccessStatusCode)
                 {
-                    dataGridView.DataSource = list;
-                    dataGridView.Columns[0].Visible = false;
-                    dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    List<GBIingridientViewModel> list = APIClient.GetElement<List<GBIingridientViewModel>>(response);
+                    if (list != null)
+                    {
+                        dataGridView.DataSource = list;
+                        dataGridView.Columns[0].Visible = false;
+                        dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
                 }
             }
             catch (Exception ex)
@@ -52,7 +55,7 @@ namespace GBIplantView
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormGBIingridient>();
+            var form = new FormGBIingridient();
             if (form.ShowDialog() == DialogResult.OK)
             {
                 LoadData();
@@ -63,7 +66,7 @@ namespace GBIplantView
         {
             if (dataGridView.SelectedRows.Count == 1)
             {
-                var form = Container.Resolve<FormGBIingridient>();
+                var form = new FormGBIingridient();
                 form.Id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
@@ -81,7 +84,11 @@ namespace GBIplantView
                     int id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
                     try
                     {
-                        service.DelGBIingridient(id);
+                        var response = APIClient.PostRequest("api/GBIingridient/DelElement", new BuyerBindingModel { Id = id });
+                        if (!response.Result.IsSuccessStatusCode)
+                        {
+                            throw new Exception(APIClient.GetError(response));
+                        }
                     }
                     catch (Exception ex)
                     {

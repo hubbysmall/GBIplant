@@ -10,8 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+
 
 namespace GBIplantView
 {  
@@ -26,23 +25,30 @@ namespace GBIplantView
         public FormMain(IMainService service, IReportingService reportingServic)
         {
             InitializeComponent();
-            this.service = service;
-            this.reportingService = reportingServic;
         }
 
         private void LoadData()
         {
             try
             {
-                List<ZakazViewModel> list = service.GetList();
-                if (list != null)
+                var response = APIClient.GetRequest("api/Main/GetList");
+                if (response.Result.IsSuccessStatusCode)
                 {
-                    dataGridView.DataSource = list;
-                    dataGridView.Columns[0].Visible = false;
-                    dataGridView.Columns[1].Visible = false;
-                    dataGridView.Columns[3].Visible = false;
-                    dataGridView.Columns[5].Visible = false;
-                    dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+                    List<ZakazViewModel> list = APIClient.GetElement<List<ZakazViewModel>>(response);
+                    if (list != null)
+                    {
+                        dataGridView.DataSource = list;
+                        dataGridView.Columns[0].Visible = false;
+                        dataGridView.Columns[1].Visible = false;
+                        dataGridView.Columns[3].Visible = false;
+                        dataGridView.Columns[5].Visible = false;
+                        dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
                 }
             }
             catch (Exception ex)
@@ -53,43 +59,43 @@ namespace GBIplantView
 
         private void клиентыToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormBuyers>();
+            var form = new FormBuyers();
             form.ShowDialog();
         }
 
         private void компонентыToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormGBIingridients>();
+            var form = new FormGBIingridients();
             form.ShowDialog();
         }
 
         private void изделияToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormGBIpieceOfArts>();
+            var form = new FormGBIpieceOfArts();
             form.ShowDialog();
         }
 
         private void складыToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormStorages>();
+            var form = new FormStorages();
             form.ShowDialog();
         }
 
         private void сотрудникиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormExecutors>();
+            var form = new FormExecutors();
             form.ShowDialog();
         }
 
         private void пополнитьСкладToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormPutInStorage>();
+            var form = new FormPutInStorage();
             form.ShowDialog();
         }
 
         private void buttonCreateOrder_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormCreateZakaz>();
+            var form = new FormCreateZakaz();
             form.ShowDialog();
             LoadData();
         }
@@ -98,8 +104,10 @@ namespace GBIplantView
         {
             if (dataGridView.SelectedRows.Count == 1)
             {
-                var form = Container.Resolve<FormTakeZakazInWork>();
-                form.Id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
+                var form = new FormTakeZakazInWork
+                {
+                    Id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value)
+                };
                 form.ShowDialog();
                 LoadData();
             }
@@ -112,8 +120,18 @@ namespace GBIplantView
                 int id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
                 try
                 {
-                    service.FinishZakaz(id);
-                    LoadData();
+                    var response = APIClient.PostRequest("api/Main/FinishOrder", new ZakazBindingModel
+                    {
+                        Id = id
+                    });
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        LoadData();
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -129,8 +147,18 @@ namespace GBIplantView
                 int id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
                 try
                 {
-                    service.PayZakaz(id);
-                    LoadData();
+                    var response = APIClient.PostRequest("api/Main/PayOrder", new ZakazBindingModel
+                    {
+                        Id = id
+                    });
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        LoadData();
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -154,11 +182,18 @@ namespace GBIplantView
             {
                 try
                 {
-                    reportingService.SaveGBIpieceOfArtPrice(new ReportingBindingModel
+                    var response = APIClient.PostRequest("api/Reporting/SaveProductPrice", new ReportingBindingModel
                     {
                         FileName = sfd.FileName
                     });
-                    MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -169,13 +204,13 @@ namespace GBIplantView
 
         private void Наполнение_складовToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormStoragesLoad>();
+            var form = new FormStoragesLoad();
             form.ShowDialog();
         }
 
         private void накладныеКлиентовToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormBuyerZakazes>();
+            var form = new FormBuyerZakazes();
             form.ShowDialog();
         }
     }

@@ -9,39 +9,40 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+
 
 namespace GBIplantView
 {
     public partial class FormGBIpieceOfArt__ingridient : Form
     {
-       [Dependency]
-        public new IUnityContainer Container { get; set; }
+  
 
        public GBIpieceofArt__ingridientViewModel Model { set { model = value; } get { return model; } }
 
-       private readonly IGBIingridientService service;
 
         private GBIpieceofArt__ingridientViewModel model;
 
-        public FormGBIpieceOfArt__ingridient(IGBIingridientService service)
+        public FormGBIpieceOfArt__ingridient()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormProductComponent_Load(object sender, EventArgs e)
         {
-            try
+           
+             try
             {
-                List<GBIingridientViewModel> list = service.GetList();
-                if (list != null)
+                var response = APIClient.GetRequest("api/GBIingridient/GetList");
+                if (response.Result.IsSuccessStatusCode)
                 {
                     comboBoxComponent.DisplayMember = "GBIingridientName";
                     comboBoxComponent.ValueMember = "Id";
-                    comboBoxComponent.DataSource = list;
+                    comboBoxComponent.DataSource = APIClient.GetElement<List<GBIingridientViewModel>>(response);
                     comboBoxComponent.SelectedItem = null;
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
                 }
             }
             catch (Exception ex)

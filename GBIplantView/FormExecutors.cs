@@ -1,4 +1,5 @@
-﻿using GBIplantService.Interfaces;
+﻿using GBIplantService.BindingModels;
+using GBIplantService.Interfaces;
 using GBIplantService.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -9,22 +10,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+
 
 namespace GBIplantView
 {
     public partial class FormExecutors : Form
     {
-      [Dependency]
-        public new IUnityContainer Container { get; set; }
+      
 
-      private readonly IExecutorService service;
-
-      public FormExecutors(IExecutorService service)
+      public FormExecutors()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormImplementers_Load(object sender, EventArgs e)
@@ -36,12 +32,20 @@ namespace GBIplantView
         {
             try
             {
-                List<ExecutorViewModel> list = service.GetList();
-                if (list != null)
+                var response = APIClient.GetRequest("api/Executor/GetList");
+                if (response.Result.IsSuccessStatusCode)
                 {
-                    dataGridView.DataSource = list;
-                    dataGridView.Columns[0].Visible = false;
-                    dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    List<ExecutorViewModel> list = APIClient.GetElement<List<ExecutorViewModel>>(response);
+                    if (list != null)
+                    {
+                        dataGridView.DataSource = list;
+                        dataGridView.Columns[0].Visible = false;
+                        dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
                 }
             }
             catch (Exception ex)
@@ -52,7 +56,7 @@ namespace GBIplantView
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormExecutor>();
+            var form =new FormExecutor();
             if (form.ShowDialog() == DialogResult.OK)
             {
                 LoadData();
@@ -63,7 +67,7 @@ namespace GBIplantView
         {
             if (dataGridView.SelectedRows.Count == 1)
             {
-                var form = Container.Resolve<FormExecutor>();
+                var form = new FormExecutor();
                 form.Id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
@@ -81,7 +85,11 @@ namespace GBIplantView
                     int id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
                     try
                     {
-                        service.DelExecutor(id);
+                        var response = APIClient.PostRequest("api/Executor/DelElement", new BuyerBindingModel { Id = id });
+                        if (!response.Result.IsSuccessStatusCode)
+                        {
+                            throw new Exception(APIClient.GetError(response));
+                        }
                     }
                     catch (Exception ex)
                     {
