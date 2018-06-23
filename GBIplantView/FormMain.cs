@@ -13,10 +13,16 @@ using System.Windows.Forms;
 
 
 namespace GBIplantView
-{
+{  
     public partial class FormMain : Form
     {
-         public FormMain()
+        [Dependency]
+        public new IUnityContainer Container { get; set; }
+
+        private readonly IMainService service;
+        private readonly IReportingService reportingService;
+
+        public FormMain(IMainService service, IReportingService reportingServic)
         {
             InitializeComponent();
         }
@@ -158,7 +164,6 @@ namespace GBIplantView
         {
             LoadData();
         }
-
         private void Прайс_лист_ЖБИ_изделийToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog
