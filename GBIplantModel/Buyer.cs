@@ -12,11 +12,16 @@ namespace GBIplantModel
     {
         public int Id { get; set; }
 
+        public string Mail { get; set; }
+
         [Required]
         public string BuyerFIO { get; set; }
 
 
         [ForeignKey("BuyerId")]
         public virtual List<Zakaz> Zakazes { get; set; }
+
+        [ForeignKey("BuyerId")]
+        public virtual List<MessageInfo> MessageInfos { get; set; }
     }
 }

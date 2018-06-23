@@ -37,6 +37,8 @@ namespace GBIplantService
 
         public virtual DbSet<Storage__GBIingridient> Storage__GBIingridients { get; set; }
 
+        public virtual DbSet<MessageInfo> MessageInfos { get; set; }
+
         public override int SaveChanges()
         {
             try

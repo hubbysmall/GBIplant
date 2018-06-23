@@ -25,7 +25,8 @@ namespace GBIplantService.realizationDB
                 .Select(rec => new BuyerViewModel
                 {
                     Id = rec.Id,
-                    BuyerFIO = rec.BuyerFIO
+                    BuyerFIO = rec.BuyerFIO,
+                    Mail = rec.Mail
                 })
                 .ToList();
             return result;
@@ -39,7 +40,8 @@ namespace GBIplantService.realizationDB
                 return new BuyerViewModel
                 {
                     Id = element.Id,
-                    BuyerFIO = element.BuyerFIO
+                    BuyerFIO = element.BuyerFIO,
+                    Mail = element.Mail
                 };
             }
             throw new Exception("Элемент не найден");
@@ -54,7 +56,8 @@ namespace GBIplantService.realizationDB
             }
             context.Buyers.Add(new Buyer
             {
-                BuyerFIO = model.BuyerFIO
+                BuyerFIO = model.BuyerFIO,
+                Mail = model.Mail
             });
             context.SaveChanges();           
         }
@@ -72,6 +75,7 @@ namespace GBIplantService.realizationDB
                 throw new Exception("Элемент не найден");
             }
             element.BuyerFIO = model.BuyerFIO;
+            element.Mail = model.Mail;
             context.SaveChanges();
         }
 
